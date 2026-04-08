@@ -24,9 +24,6 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
-# Data volume — SQLite database lives here
-VOLUME ["/app/data"]
-
 ENV NODE_ENV=production
 ENV PORT=3000
 
