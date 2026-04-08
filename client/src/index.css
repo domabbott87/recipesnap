@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ── Brand palette: white app + electric blue + yellow accent ─────────── */
+  :root {
+    /* Surfaces — white / near-white */
+    --background:         0 0% 100%;
+    --foreground:         230 15% 8%;
+
+    --card:               230 50% 98%;
+    --card-foreground:    230 15% 8%;
+
+    --popover:            0 0% 100%;
+    --popover-foreground: 230 15% 8%;
+
+    /* Primary — electric blue #2338FF */
+    --primary:            234 100% 57%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary — very light periwinkle */
+    --secondary:          234 60% 94%;
+    --secondary-foreground: 234 100% 40%;
+
+    /* Muted — soft grey-blue */
+    --muted:              230 25% 94%;
+    --muted-foreground:   230 12% 52%;
+
+    /* Accent — brand yellow #FFE000 */
+    --accent:             52 100% 50%;
+    --accent-foreground:  230 15% 8%;
+
+    /* Destructive */
+    --destructive:        0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Structure */
+    --border:             230 25% 88%;
+    --input:              230 25% 92%;
+    --ring:               234 100% 57%;
+
+    --radius:             0.75rem;
+
+    /* Fonts */
+    --font-body:    'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+    /* Brand yellow for decorative use */
+    --yellow: #FFE000;
+    --blue:   #2338FF;
+  }
+
+  .dark {
+    --background:         230 20% 7%;
+    --foreground:         230 15% 90%;
+
+    --card:               230 18% 10%;
+    --card-foreground:    230 15% 90%;
+
+    --popover:            230 18% 10%;
+    --popover-foreground: 230 15% 90%;
+
+    --primary:            234 95% 68%;
+    --primary-foreground: 230 20% 7%;
+
+    --secondary:          234 30% 18%;
+    --secondary-foreground: 234 90% 75%;
+
+    --muted:              230 18% 14%;
+    --muted-foreground:   230 12% 55%;
+
+    --accent:             52 100% 50%;
+    --accent-foreground:  230 15% 8%;
+
+    --destructive:        0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border:             230 18% 18%;
+    --input:              230 18% 16%;
+    --ring:               234 95% 68%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    min-height: 100dvh;
+    line-height: 1.55;
+    font-weight: 500;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+}
+
+/* ── Custom utilities ─────────────────────────────────────────────────── */
+
+/* Yellow splash background */
+.bg-brand-yellow {
+  background-color: var(--yellow);
+  color: hsl(var(--foreground));
+}
+
+/* Blue pill badge */
+.badge-blue {
+  @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary text-primary text-xs font-semibold;
+}
+
+/* Recipe card */
+.recipe-card {
+  transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.recipe-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px hsl(234 100% 57% / 0.12);
+}
+
+/* Illustration placeholder */
+.illus-placeholder {
+  @apply rounded-xl bg-secondary flex items-center justify-center;
+}
+
+/* Shimmer skeleton */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--border)) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+/* Tab active indicator */
+.tab-active {
+  @apply text-primary font-bold border-b-2 border-primary;
+}
+.tab-inactive {
+  @apply text-muted-foreground border-b-2 border-transparent hover:text-foreground;
+}
+
+/* Serves counter button */
+.serves-btn {
+  @apply w-8 h-8 rounded-full border-2 border-primary text-primary font-bold flex items-center justify-center hover:bg-primary hover:text-white transition-colors;
+}
+
+/* Units toggle */
+.unit-btn {
+  @apply px-3 py-1 text-xs font-bold rounded-full transition-colors;
+}
+.unit-btn-active {
+  @apply bg-primary text-white;
+}
+.unit-btn-inactive {
+  @apply bg-muted text-muted-foreground hover:bg-secondary;
+}

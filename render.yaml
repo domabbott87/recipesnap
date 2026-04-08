@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: recipesnap
+    runtime: node
+    buildCommand: npm ci && npm run build
+    startCommand: node dist/index.cjs
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ANTHROPIC_API_KEY
+        sync: false          # You set this in the Render dashboard
+      - key: SESSION_SECRET
+        generateValue: true  # Render auto-generates a secure random value
+      - key: DATA_DIR
+        value: /var/data
+    disk:
+      name: recipesnap-data
+      mountPath: /var/data
+      sizeGB: 1
