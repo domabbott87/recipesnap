@@ -11,6 +11,7 @@ import {
   Pencil, Check, X, Zap, Infinity, Shield, Headphones,
   Sparkles,
 } from "lucide-react";
+import { Analytics } from "@/lib/analytics";
 import { FREE_RECIPE_LIMIT } from "@shared/schema";
 
 // ── Chip multi-select ──────────────────────────────────────────────────────
@@ -292,7 +293,9 @@ export default function Profile() {
               </div>
 
               {/* CTA */}
-              <Button className="w-full h-12 rounded-full bg-primary hover:bg-primary/90 text-white font-bold text-base gap-2">
+              <Button
+                onClick={() => Analytics.upgradeCtaClicked(billing)}
+                className="w-full h-12 rounded-full bg-primary hover:bg-primary/90 text-white font-bold text-base gap-2">
                 <Crown size={16} />
                 Start Premium
               </Button>

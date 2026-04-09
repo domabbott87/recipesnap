@@ -7,7 +7,9 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Recipe } from "@shared/schema";
 import { ArrowLeft, Pencil, Trash2, Share2, CheckCircle2, Circle, Clock, ChefHat, Heart } from "lucide-react";
+import { useEffect } from "react";
 import { useAuth } from "@/lib/auth";
+import { Analytics } from "@/lib/analytics";
 import { NoodleBowl } from "@/components/Illustrations";
 
 function parse<T>(s: string | null | undefined, fallback: T): T {
@@ -50,10 +52,16 @@ export default function RecipeDetail() {
     queryKey: ["/api/recipes", id],
   });
 
+  // Track recipe view once loaded
+  useEffect(() => {
+    if (recipe?.title) Analytics.recipeViewed(recipe.title);
+  }, [recipe?.title]);
+
   const deleteMutation = useMutation({
     mutationFn: () => apiRequest("DELETE", `/api/recipes/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/recipes"] });
+      Analytics.recipeDeleted();
       toast({ title: "Recipe deleted" });
       navigate("/");
     },
@@ -61,7 +69,10 @@ export default function RecipeDetail() {
 
   const favMutation = useMutation({
     mutationFn: (val: boolean) => apiRequest("PUT", `/api/recipes/${id}`, { isFavourite: val }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/recipes", id] }),
+    onSuccess: (_data, val) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/recipes", id] });
+      Analytics.recipeFavourited(val);
+    },
   });
 
   if (isLoading) return <Layout><div className="max-w-2xl mx-auto px-4 sm:px-6"><SkeletonDetail /></div></Layout>;

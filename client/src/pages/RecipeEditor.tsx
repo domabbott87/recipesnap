@@ -9,6 +9,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Recipe } from "@shared/schema";
 import { draftStore } from "./Snap";
+import { Analytics } from "@/lib/analytics";
 import { Plus, Trash2, Save, ArrowLeft, GripVertical, Tag, X } from "lucide-react";
 
 function parse<T>(s: string | null | undefined, fallback: T): T {
@@ -160,6 +161,7 @@ export default function RecipeEditor() {
       queryClient.invalidateQueries({ queryKey: ["/api/recipes"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       toast({ title: "Recipe saved!" });
+      Analytics.recipeSaved(recipe.title, draftStore.get()?.imageDataUrl ? "image" : "manual");
       navigate(`/recipe/${recipe.id}`);
     },
     onError: (err: any) => {

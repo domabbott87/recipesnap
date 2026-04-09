@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from "rea
 import { apiRequest, API_BASE } from "./queryClient";
 import type { UserPreferences, DEFAULT_PREFERENCES } from "@shared/schema";
 import { DEFAULT_PREFERENCES as PREFS_DEFAULT } from "@shared/schema";
+import { identifyUser, resetUser, Analytics } from "./analytics";
 
 export type { UserPreferences };
 
@@ -50,7 +51,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch(`${API_BASE}/api/auth/me`, { credentials: "include" });
       if (res.ok) {
         const d = await res.json();
-        setUser({ ...d, preferences: mergePrefs(d.preferences) });
+        const u = { ...d, preferences: mergePrefs(d.preferences) };
+        setUser(u);
+        identifyUser(u.id, u.email, u.plan);
       } else setUser(null);
     } catch { setUser(null); }
     finally { setLoading(false); }
@@ -61,17 +64,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     const res = await apiRequest("POST", "/api/auth/login", { email, password });
     const d = await res.json();
-    setUser({ ...d, preferences: mergePrefs(d.preferences) });
+    const u = { ...d, preferences: mergePrefs(d.preferences) };
+    setUser(u);
+    identifyUser(u.id, u.email, u.plan);
+    Analytics.loggedIn();
   };
 
   const register = async (email: string, password: string, name: string) => {
     const res = await apiRequest("POST", "/api/auth/register", { email, password, name });
     const d = await res.json();
-    setUser({ ...d, preferences: mergePrefs(d.preferences) });
+    const u = { ...d, preferences: mergePrefs(d.preferences) };
+    setUser(u);
+    identifyUser(u.id, u.email, u.plan);
+    Analytics.signedUp(u.plan);
   };
 
   const logout = async () => {
     await apiRequest("POST", "/api/auth/logout");
+    Analytics.loggedOut();
+    resetUser();
     setUser(null);
   };
 

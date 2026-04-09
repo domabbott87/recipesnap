@@ -13,6 +13,7 @@ import {
 import { SiInstagram } from "react-icons/si";
 import { NoodleBowl, Tomato, Carrot } from "@/components/Illustrations";
 import { API_BASE } from "@/lib/queryClient";
+import { Analytics } from "@/lib/analytics";
 
 interface ExtractedRecipe {
   title: string;
@@ -77,9 +78,15 @@ export default function Snap() {
     if (f) handleFile(f);
   }, [handleFile]);
 
-  const handleExtract = async (endpoint: string, body: BodyInit, isJson = false) => {
+  const handleExtract = async (
+    endpoint: string,
+    body: BodyInit,
+    method: "image" | "url" | "instagram_caption",
+    isJson = false
+  ) => {
     setIsExtracting(true);
     setError(null);
+    Analytics.extractionStarted(method);
     try {
       const res = await fetch(`${API_BASE}${endpoint}`, {
         method: "POST",
@@ -87,9 +94,15 @@ export default function Snap() {
         body,
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error ?? "Extraction failed."); return; }
+      if (!res.ok) {
+        Analytics.extractionFailed(method, data.error ?? "unknown");
+        setError(data.error ?? "Extraction failed.");
+        return;
+      }
+      Analytics.extractionCompleted(method, data.title ?? "");
       setExtracted(data as ExtractedRecipe);
     } catch (err: any) {
+      Analytics.extractionFailed(method, err.message ?? "network");
       setError(err.message ?? "Network error.");
     } finally {
       setIsExtracting(false);
@@ -100,17 +113,17 @@ export default function Snap() {
     if (!file) return;
     const formData = new FormData();
     formData.append("image", file);
-    handleExtract("/api/extract-recipe", formData);
+    handleExtract("/api/extract-recipe", formData, "image");
   };
 
   const extractFromUrl = () => {
     if (!urlInput.trim()) return;
-    handleExtract("/api/extract-recipe-url", JSON.stringify({ url: urlInput.trim() }), true);
+    handleExtract("/api/extract-recipe-url", JSON.stringify({ url: urlInput.trim() }), "url", true);
   };
 
   const extractFromCaption = () => {
     if (!captionText.trim()) return;
-    handleExtract("/api/extract-recipe-text", JSON.stringify({ text: captionText.trim() }), true);
+    handleExtract("/api/extract-recipe-text", JSON.stringify({ text: captionText.trim() }), "instagram_caption", true);
   };
 
   const handleUseRecipe = () => {

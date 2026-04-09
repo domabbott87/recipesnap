@@ -1,10 +1,12 @@
 import { Switch, Route, Router, Redirect } from "wouter";
 import { useHashLocation } from "wouter/use-hash-location";
+import { useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { AuthProvider, useAuth } from "./lib/auth";
+import { initAnalytics, trackPageview } from "./lib/analytics";
 import Library from "./pages/Library";
 import Collections from "./pages/Collections";
 import Snap from "./pages/Snap";
@@ -14,6 +16,16 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/not-found";
+
+// Init PostHog once
+initAnalytics();
+
+/** Fires a pageview on every hash-route change */
+function PageviewTracker() {
+  const [loc] = useHashLocation();
+  useEffect(() => { trackPageview(loc); }, [loc]);
+  return null;
+}
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -41,6 +53,7 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
           <Router hook={useHashLocation}>
+            <PageviewTracker />
             <AuthGate>
               <Switch>
                 <Route path="/login" component={Login} />
