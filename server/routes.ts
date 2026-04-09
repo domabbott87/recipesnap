@@ -40,7 +40,7 @@ function getAnthropic(): Anthropic {
 /** Call Claude with model fallback. Returns the text response. */
 async function callClaude(messages: Anthropic.MessageParam[]): Promise<string> {
   const client = getAnthropic();
-  const MODELS = ["claude-3-5-haiku-20241022", "claude-3-5-sonnet-20241022", "claude-3-haiku-20240307"];
+  const MODELS = ["claude-haiku-4-5", "claude-sonnet-4-5"];
   let lastError: any;
   for (const model of MODELS) {
     try {
@@ -221,7 +221,7 @@ Rules:
 - If no recipe is visible, return {"error": "No recipe found in image"}`;
 
     // Try models in order until one works
-    const MODELS = ["claude-3-5-haiku-20241022", "claude-3-5-sonnet-20241022", "claude-3-haiku-20240307"];
+    const MODELS = ["claude-haiku-4-5", "claude-sonnet-4-5"];
 
     try {
       const client = getAnthropic();
